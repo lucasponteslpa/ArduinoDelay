@@ -107,7 +107,7 @@ void loop()
   PORTD = PORTD  | 128;       //  Test Output on pin 7
   f_sample=false;
 
-  aux = badc1 + dd[i+1];
+  aux = badc1 + dd[i+1]; //SOMA AMOSTRA ATUAL COM O ECO DE AMPLITUDE PELA METADE(SO TEM UM IMPULSO) 
   OCR2A=aux;                // output audio to PWM port (pin 11)
   // variable delay controlled by potentiometer    
   // when distortion then delay / processing time is too long   
@@ -129,7 +129,7 @@ ISR(TIMER2_OVF_vect) {
   div32=!div32;                      // divide timer2 frequency / 2 to 31.25kHz
   if (div32){ 
     div8=!div8;  
-    if (div8)
+    if (div8) //MAIS UM CONDICIONAL PARA DIMINUIR A FREQUENCIA DE AMOSTRAGEM E TORNAR O DELAY APARENTE 
       {
           div16=!div16;  // 
           if (div16) {                     // sample channel 0 and 1 alternately so each channel is sampled with 15.6kHz
@@ -141,12 +141,12 @@ ISR(TIMER2_OVF_vect) {
             badc1=ADCH;                    // get ADC channel 1
             cbi(ADMUX,MUX0);               // set multiplexer to channel 0
             f_sample=true;
-            i++;
+            i++;//ANDAR COM O BUFFER
             if (i + 1 > 1498)
             {
               i = 0;
             }
-            dd[i] = badc1*0.5;
+            dd[i] = badc1*0.5;//ARMAZENA AMOSTRA ATUAL
           }
       }
     ibb++;                          // short delay before start conversion
