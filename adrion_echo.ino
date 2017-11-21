@@ -33,7 +33,7 @@ volatile byte ibb;
 
 int i = 0;
 int ii;
-volatile byte dd[511];  // Audio Memory Array 8-Bit
+volatile byte dd[1500];  // Audio Memory Array 8-Bit
 
 void setup()
 {
@@ -139,7 +139,8 @@ ISR(TIMER2_OVF_vect) {
             {
               i = 0;
             }
-            dd[i] = badc1 + dd[i];//ARMAZENA AMOSTRA ATUAL
+            dd[i] = badc1 + 0.5*dd[i];//ARMAZENA AMOSTRA ATUAL mais a antigo reduzida pela metado(ou seja, a amplitude do sinal
+                                      //mais antigo tende a 0.. fazendo varios delays
           }
       }
     ibb++;                          // short delay before start conversion
