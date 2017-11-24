@@ -9,7 +9,7 @@
 boolean div32;
 boolean div16;
 boolean div8;
-// vars altered by interrupt
+
 volatile boolean f_sample;
 volatile byte audio_in;
 volatile byte audio_out;
@@ -35,8 +35,8 @@ void setup()
   cbi (TCCR2B, CS22);
 
   // habilitar porta do Timer2 PWM
-  sbi(DDRB,3);                    // set digital pin 11 to output
-  sbi (TIMSK2,TOIE2);              // enable Timer2 Interrupt
+  sbi(DDRB,3);                    // seta o pino digital 11 como saida
+  sbi (TIMSK2,TOIE2);              // liga Timer2 Interrupt
 
 }
 
@@ -49,7 +49,7 @@ void loop()
   f_sample=false;
 
   audio_out = audio_in + echo_buffer[i+1]; //SOMA AMOSTRA ATUAL COM O ECO DE AMPLITUDE PELA METADE(SO TEM UM IMPULSO) 
-  if(i+1<=1499)OCR2A=audio_out;                // output audio to PWM port (pin 11)
+  if(i+1<=1499)OCR2A=audio_out;                // output audio na  porta PWM (pin 11)
   else OCR2A = audio_in;
 }
 //na inturrupcao amostra é retirada em: 16Mhz / 256 / 2 / 2/ 2 = 7812 Hz
@@ -61,13 +61,13 @@ ISR(TIMER2_OVF_vect) {
     if (div8) //MAIS UM CONDICIONAL PARA DIMINUIR A FREQUENCIA DE AMOSTRAGEM E TORNAR O DELAY APARENTE 
       {
           div16=!div16;  // 
-          if (div16) {                     // sample channel 0 and 1 alternately so each channel is sampled with 15.6kHz
-             sbi(ADMUX,MUX0);               // set multiplexer to channel 1 
+          if (div16) {                  
+             sbi(ADMUX,MUX0);               // seta o multiplexador para o canal 1 
           }
           else
           {
-            audio_in=ADCH;                    // get ADC channel 1
-            cbi(ADMUX,MUX0);               // set multiplexer to channel 0
+            audio_in=ADCH;                    // pega ADC do canal 1
+            cbi(ADMUX,MUX0);               // seta o multiplexador para o canal 0
             f_sample=true;
             i++;//ANDAR COM O BUFFER
             echo_buffer[i] = audio_in*0.5;//ARMAZENA AMOSTRA ATUAL
@@ -78,7 +78,7 @@ ISR(TIMER2_OVF_vect) {
             }
           }
       }   
-    sbi(ADCSRA,ADSC);               // start next conversion
+    sbi(ADCSRA,ADSC);
   }
     
 }
