@@ -44,16 +44,11 @@ void setup()
 {
   pinMode(ledPin, OUTPUT);      // sets the digital pin as output
   pinMode(testPin, OUTPUT);
-  Serial.begin(57600);        // connect to the serial port
-  Serial.println("Arduino Audio Loopback");
-  for(int i = 0;i<1500;i++){
-    dd[i]=0;
-  }
-
+  
   // set adc prescaler  to 64 for 19kHz sampling frequency
-  cbi(ADCSRA, ADPS2);
-  sbi(ADCSRA, ADPS1);
-  sbi(ADCSRA, ADPS0);
+  //cbi(ADCSRA, ADPS2);
+  //sbi(ADCSRA, ADPS1);
+  //sbi(ADCSRA, ADPS0);
 
 
 
@@ -90,9 +85,10 @@ void setup()
   cbi (TIMSK0,TOIE0);              // disable Timer0 !!! delay is off now
   sbi (TIMSK2,TOIE2);              // enable Timer2 Interrupt
   
-  Serial.print("ADC offset=");     // trim to 127
+  //Serial.print("ADC offset=");     // trim to 127
   ii=badc1;  
-  Serial.println(ii);
+ 
+  //Serial.println(ii);
 
 
 }
@@ -108,7 +104,8 @@ void loop()
   f_sample=false;
 
   aux = badc1 + dd[i+1]; //SOMA AMOSTRA ATUAL COM O ECO DE AMPLITUDE PELA METADE(SO TEM UM IMPULSO) 
-  OCR2A=aux;                // output audio to PWM port (pin 11)
+  if(i+1<=1499)OCR2A=aux;                // output audio to PWM port (pin 11)
+  else OCR2A = badc1;
   // variable delay controlled by potentiometer    
   // when distortion then delay / processing time is too long   
  // for (cnta=0; cnta <= badc0; cnta++) { 
@@ -142,11 +139,12 @@ ISR(TIMER2_OVF_vect) {
             cbi(ADMUX,MUX0);               // set multiplexer to channel 0
             f_sample=true;
             i++;//ANDAR COM O BUFFER
-            if (i + 1 > 1498)
+            dd[i] = badc1*0.5;//ARMAZENA AMOSTRA ATUAL
+            
+            if (i == 1499)
             {
               i = 0;
             }
-            dd[i] = badc1*0.5;//ARMAZENA AMOSTRA ATUAL
           }
       }
     ibb++;                          // short delay before start conversion
